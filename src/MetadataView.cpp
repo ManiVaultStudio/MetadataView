@@ -42,6 +42,8 @@ void MetadataView::init()
 
     _tableView = new QTableView(&this->getWidget());
 
+    //connect(_tableModel, &QAbstractItemModel::rowsInserted, _tableView, &QTableView::update);
+
     _tableModel->insertColumns(0, 5);
     _tableModel->insertRows(0, 3);
 
@@ -81,7 +83,7 @@ void MetadataView::init()
     // Alternatively, classes which derive from hdsp::EventListener (all plugins do) can also respond to events
     _eventListener.addSupportedEventType(static_cast<std::uint32_t>(EventType::DatasetAdded));
 
-    _eventListener.registerDataEventByType(PointType, std::bind(&MetadataView::onDataEvent, this, std::placeholders::_1));
+    _eventListener.registerDataEventByType(TextType, std::bind(&MetadataView::onDataEvent, this, std::placeholders::_1));
 }
 
 void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
@@ -100,6 +102,8 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
         {
             // Cast the data event to a data added event
             const auto dataAddedEvent = static_cast<DatasetAddedEvent*>(dataEvent);
+
+            _tableModel->setData(changedDataSet);
 
             // Get the GUI name of the added points dataset and print to the console
             qDebug() << datasetGuiName << "was added";

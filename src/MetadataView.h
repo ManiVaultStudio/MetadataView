@@ -8,6 +8,7 @@
 #include <widgets/DropWidget.h>
 
 #include <PointData/PointData.h>
+#include <TextData/TextData.h>
 
 #include <QWidget>
 

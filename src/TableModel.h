@@ -2,10 +2,14 @@
 
 #include <QAbstractTableModel>
 
+#include <TextData/TextData.h>
+
 class TableModel : public QAbstractTableModel
 {
 public:
     TableModel(QObject* parent = nullptr);
+
+    void setData(mv::Dataset<Text> data);
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -18,6 +22,7 @@ public:
 
     // Already implemented by QAbstractTableModel
     //QModelIndex parent(const QModelIndex& index) const override;
-private:
 
+private:
+    mv::Dataset<Text> _data;
 };
