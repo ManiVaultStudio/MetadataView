@@ -6,6 +6,7 @@
 
 #include <Dataset.h>
 #include <widgets/DropWidget.h>
+#include <actions/OptionAction.h>
 
 #include <PointData/PointData.h>
 #include <TextData/TextData.h>
@@ -53,9 +54,10 @@ public:
 
 protected:
     DropWidget*             _dropWidget;                /** Widget for drag and drop behavior */
-    mv::Dataset<Points>     _points;                    /** Points smart pointer */
-    QString                 _currentDatasetName;        /** Name of the current dataset */
 
+    mv::Dataset<Text>       _currentDataset;
+    OptionAction*           _optionAction;
+    QLineEdit*              _searchInput;
     QTableView*             _tableView;
     TableModel*             _tableModel;
 };

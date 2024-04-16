@@ -17,6 +17,12 @@ public:
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
+public slots:
+    void onViewIndicesChanged();
+
+private:
+    void updateModel();
+
     // Already implemented by QAbstractTableModel
     //QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 
@@ -25,4 +31,6 @@ public:
 
 private:
     mv::Dataset<Text> _data;
+
+    std::vector<uint32_t> _viewIndices;
 };
