@@ -71,15 +71,15 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
         {
             switch (section) {
             case 0:
-                return QString("cell_id");
+                return QString("Cell ID");
             case 1:
-                return QString("tree_class");
+                return QString("Cell Name");
             case 2:
-                return QString("tree_subclass");
+                return QString("Subclass");
             case 3:
-                return QString("tree_cluster");
+                return QString("Cluster");
             case 4:
-                return QString("paradigm");
+                return QString("Paradigm");
             }
         }
         else
@@ -93,7 +93,7 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
 void TableModel::onViewIndicesChanged()
 {
     _viewIndices = _data->getSelectionIndices();
-    qDebug() << "Selection changed3";
+
     updateModel();
 }
 

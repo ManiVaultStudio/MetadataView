@@ -116,13 +116,12 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
         // The selection of a dataset got changed
         case EventType::DatasetDataSelectionChanged:
         {
-            qDebug() << "Selection changed";
             if (!_currentDataset.isValid())
                 break;
-            qDebug() << "Selection changed1";
+
             if (changedDataSet != _currentDataset)
                 break;
-            qDebug() << "Selection changed2";
+
             _tableModel->onViewIndicesChanged();
 
             break;
