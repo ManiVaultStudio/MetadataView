@@ -38,6 +38,10 @@ void MetadataView::init()
     //connect(_searchInput, &QLineEdit::textChanged, 
 
     _optionAction = new OptionAction(&this->getWidget(), "Search input");
+    _selectionModeButton = new ToggleAction(&this->getWidget(), "Selection mode");
+    connect(_selectionModeButton, &ToggleAction::toggled, this, [this](bool enabled) {
+        _tableModel->setMode(enabled ? TableModel::Mode::SELECTION : TableModel::Mode::FILTER);
+    });
 
     _tableModel = new TableModel(&this->getWidget());
     _tableModel->setHeaderData(0, Qt::Horizontal, QObject::tr("Beep"));
@@ -55,6 +59,7 @@ void MetadataView::init()
 
     layout->addWidget(_optionAction->createWidget(&this->getWidget(), OptionAction::WidgetFlag::LineEdit));
     layout->addWidget(_tableView);
+    layout->addWidget(_selectionModeButton->createWidget(&this->getWidget()));
 
     // Check if a text dataset already exist that contains "metadata" in the name
     for (mv::Dataset dataset : mv::data().getAllDatasets())

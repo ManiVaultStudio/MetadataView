@@ -60,6 +60,9 @@ protected:
     QLineEdit*              _searchInput;
     QTableView*             _tableView;
     TableModel*             _tableModel;
+
+    // Search GUI
+    ToggleAction*           _selectionModeButton;
 };
 
 /**

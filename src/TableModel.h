@@ -7,9 +7,15 @@
 class TableModel : public QAbstractTableModel
 {
 public:
+    enum class Mode
+    {
+        FILTER, SELECTION
+    };
+
     TableModel(QObject* parent = nullptr);
 
     void setData(mv::Dataset<Text> data);
+    void setMode(TableModel::Mode mode) { _mode = mode; updateModel(); }
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -30,6 +36,8 @@ private:
     //QModelIndex parent(const QModelIndex& index) const override;
 
 private:
+    TableModel::Mode _mode;
+
     mv::Dataset<Text> _data;
 
     std::vector<uint32_t> _viewIndices;
