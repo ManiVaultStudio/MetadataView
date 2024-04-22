@@ -49,13 +49,29 @@ void MetadataView::init()
     _tableModel->setHeaderData(2, Qt::Horizontal, QObject::tr("Bep"));
 
     _tableView = new QTableView(&this->getWidget());
-
+    _tableView->setSortingEnabled(true);
     //connect(_tableModel, &QAbstractItemModel::rowsInserted, _tableView, &QTableView::update);
 
     _tableModel->insertColumns(0, 5);
     _tableModel->insertRows(0, 3);
 
-    _tableView->setModel(_tableModel);
+    QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel(this);
+    proxyModel->setSourceModel(_tableModel);
+    _tableView->setModel(proxyModel);
+    _tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    QItemSelectionModel* selectionModel = _tableView->selectionModel();
+    connect(selectionModel, &QItemSelectionModel::selectionChanged, this, [this, selectionModel](const QItemSelection& selected, const QItemSelection& deselected) {
+        QModelIndexList modelIndexList = selectionModel->selectedRows();
+        std::vector<uint32_t> rows(modelIndexList.size());
+        for (int i = 0; i < modelIndexList.size(); i++)
+        {
+            const QModelIndex& modelIndex = modelIndexList[i];
+            rows[i] = modelIndex.row();
+        }
+        _currentDataset->setSelectionIndices(rows);
+        events().notifyDatasetDataSelectionChanged(_currentDataset);
+    });
 
     layout->addWidget(_optionAction->createWidget(&this->getWidget(), OptionAction::WidgetFlag::LineEdit));
     layout->addWidget(_tableView);
