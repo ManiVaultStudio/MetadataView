@@ -2,15 +2,16 @@
 
 TableModel::TableModel(QObject* parent) :
     QAbstractTableModel(parent),
-    _data(nullptr),
-    _viewIndices(0)
+    _metadata(nullptr),
+    _viewIndices(0),
+    _mode(TableModel::Mode::FILTER)
 {
 
 }
 
 void TableModel::setData(mv::Dataset<Text> data)
 {
-    _data = data;
+    _metadata = data;
 
     emit dataChanged(index(0, 0), index(rowCount()-1, columnCount()-1));
 
@@ -24,42 +25,31 @@ int TableModel::rowCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    if (!_data.isValid())
+    if (!_metadata.isValid())
         return 0;
 
     if (_mode == TableModel::Mode::SELECTION)
         return _viewIndices.size();
     else
-        return _data->getNumRows();
+        return _metadata->getNumRows();
 }
 
 int TableModel::columnCount(const QModelIndex& parent) const
 {
-    return 5;
+    return _headers.size();
 }
 
 QVariant TableModel::data(const QModelIndex& index, int role) const
 {
     if (role == Qt::DisplayRole)
     {
-        if (!_data.isValid())
+        if (!_metadata.isValid())
             return QString("Row%1, Column%2").arg(index.row() + 1).arg(index.column() + 1);
         
         int rowIndex = _mode == TableModel::Mode::SELECTION ? _viewIndices[index.row()] : index.row();
 
-        switch (index.column())
-        {
-        case 0:
-            return _data->getColumn("cell_id")[rowIndex];
-        case 1:
-            return _data->getColumn("cell_name_label")[rowIndex];
-        case 2:
-            return _data->getColumn("tree_subclass")[rowIndex];
-        case 3:
-            return _data->getColumn("tree_cluster")[rowIndex];
-        case 4:
-            return _data->getColumn("paradigm")[rowIndex];
-        }
+        // Get the column based on the header name of the colIndex, then access the row from that
+        return _metadata->getColumn(_headers[index.column()].columnName)[rowIndex];
     }
 
     return QVariant();
@@ -71,18 +61,10 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
     {
         if (orientation == Qt::Horizontal)
         {
-            switch (section) {
-            case 0:
-                return QString("Cell ID");
-            case 1:
-                return QString("Cell Name");
-            case 2:
-                return QString("Subclass");
-            case 3:
-                return QString("Cluster");
-            case 4:
-                return QString("Paradigm");
-            }
+            if (section < _headers.size())
+                return _headers[section].headerName;
+            else
+                qWarning() << "Tried to access a column index higher than the number of header columns";
         }
         else
         {
@@ -94,7 +76,7 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
 
 void TableModel::onViewIndicesChanged()
 {
-    _viewIndices = _data->getSelectionIndices();
+    _viewIndices = _metadata->getSelectionIndices();
 
     updateModel();
 }

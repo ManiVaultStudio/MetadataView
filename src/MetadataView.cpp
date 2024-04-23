@@ -21,7 +21,8 @@ MetadataView::MetadataView(const PluginFactory* factory) :
     ViewPlugin(factory),
     _dropWidget(nullptr),
     _tableModel(nullptr),
-    _tableView(nullptr)
+    _tableView(nullptr),
+    _selectionModeButton(nullptr)
 {
 
 }
@@ -47,6 +48,14 @@ void MetadataView::init()
     _tableModel->setHeaderData(0, Qt::Horizontal, QObject::tr("Beep"));
     _tableModel->setHeaderData(1, Qt::Horizontal, QObject::tr("Boop"));
     _tableModel->setHeaderData(2, Qt::Horizontal, QObject::tr("Bep"));
+
+    QList<TableModel::Header> headers;
+    headers.append(TableModel::Header{ "Cell ID", "cell_id" });
+    headers.append(TableModel::Header{ "Cell Name", "cell_name_label" });
+    headers.append(TableModel::Header{ "Subclass", "tree_subclass" });
+    headers.append(TableModel::Header{ "Cluster", "tree_cluster" });
+    headers.append(TableModel::Header{ "Paradigm", "paradigm" });
+    _tableModel->setHeaders(headers);
 
     _tableView = new QTableView(&this->getWidget());
     _tableView->setSortingEnabled(true);
@@ -102,6 +111,7 @@ void MetadataView::init()
 
     // Alternatively, classes which derive from hdsp::EventListener (all plugins do) can also respond to events
     _eventListener.addSupportedEventType(static_cast<std::uint32_t>(EventType::DatasetAdded));
+    _eventListener.addSupportedEventType(static_cast<std::uint32_t>(EventType::DatasetDataChanged));
     _eventListener.addSupportedEventType(static_cast<std::uint32_t>(EventType::DatasetDataSelectionChanged));
 
     _eventListener.registerDataEventByType(TextType, std::bind(&MetadataView::onDataEvent, this, std::placeholders::_1));
@@ -130,6 +140,20 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
 
             // Get the GUI name of the added points dataset and print to the console
             qDebug() << datasetGuiName << "was added";
+
+            break;
+        }
+        case EventType::DatasetDataChanged:
+        {
+            // Cast the data event to a data added event
+            const auto dataChangedEvent = static_cast<DatasetDataChangedEvent*>(dataEvent);
+
+            _currentDataset = changedDataSet;
+
+            _tableModel->setData(changedDataSet);
+
+            // Get the GUI name of the added points dataset and print to the console
+            qDebug() << datasetGuiName << "was changed";
 
             break;
         }
