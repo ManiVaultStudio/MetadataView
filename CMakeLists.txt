@@ -43,6 +43,8 @@ set(PLUGIN_SOURCES
     src/MetadataView.cpp
     src/TableModel.h
     src/TableModel.cpp
+    src/MetadataSortFilterProxyModel.h
+    src/MetadataSortFilterProxyModel.cpp
     src/MetadataView.json
 )
 

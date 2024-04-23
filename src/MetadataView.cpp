@@ -1,5 +1,7 @@
 #include "MetadataView.h"
 
+#include "MetadataSortFilterProxyModel.h"
+
 #include <AnalysisPlugin.h>
 #include <event/Event.h>
 
@@ -55,6 +57,8 @@ void MetadataView::init()
     headers.append(TableModel::Header{ "Subclass", "tree_subclass" });
     headers.append(TableModel::Header{ "Cluster", "tree_cluster" });
     headers.append(TableModel::Header{ "Paradigm", "paradigm" });
+    headers.append(TableModel::Header{ "Sag", "sag" });
+    headers.append(TableModel::Header{ "Basal Dendrite Num Branches", "basal_dendrite_num_branches" });
     _tableModel->setHeaders(headers);
 
     _tableView = new QTableView(&this->getWidget());
@@ -64,7 +68,14 @@ void MetadataView::init()
     _tableModel->insertColumns(0, 5);
     _tableModel->insertRows(0, 3);
 
-    QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel(this);
+    // TODO Fix memory leak
+    FloatFilter* sagFilter = new FloatFilter("Sag");
+    sagFilter->minValue = 0.2;
+    sagFilter->maxValue = 0.5;
+
+    MetadataSortFilterProxyModel* proxyModel = new MetadataSortFilterProxyModel(this);
+    proxyModel->addFilter("Sag", sagFilter);
+
     proxyModel->setSourceModel(_tableModel);
     _tableView->setModel(proxyModel);
     _tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
