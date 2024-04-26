@@ -45,20 +45,34 @@ set(PLUGIN_SOURCES
     src/TableModel.cpp
     src/MetadataSortFilterProxyModel.h
     src/MetadataSortFilterProxyModel.cpp
+    src/FilterView.h
+    src/FilterView.cpp
     src/MetadataView.json
 )
+
+set(WEB
+    res/filterview/filterview.html
+    res/filterview/filterview.tools.js
+    res/js_libs/qwebchannel.tools.js
+)
+
+set(QRESOURCES
+    res/resources.qrc
+)
+QT6_ADD_RESOURCES(RESOURCE_FILES ${QRESOURCES})
 
 set(PLUGIN_MOC_HEADERS
     src/MetadataView.h
 )
 
 source_group( Plugin FILES ${PLUGIN_SOURCES})
+source_group( Web FILES ${WEB})
 
 # -----------------------------------------------------------------------------
 # CMake Target
 # -----------------------------------------------------------------------------
 # Create dynamic library for the plugin
-add_library(${PROJECT_NAME} SHARED ${PLUGIN_SOURCES})
+add_library(${PROJECT_NAME} SHARED ${PLUGIN_SOURCES} ${WEB} ${RESOURCE_FILES})
 
 qt_wrap_cpp(PLUGIN_MOC ${PLUGIN_MOC_HEADERS} TARGET ${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE ${PLUGIN_MOC})

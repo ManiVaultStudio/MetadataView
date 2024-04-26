@@ -3,6 +3,7 @@
 #include <ViewPlugin.h>
 
 #include "TableModel.h"
+#include "FilterView.h"
 
 #include <Dataset.h>
 #include <widgets/DropWidget.h>
@@ -26,6 +27,7 @@ using namespace mv::gui;
 /** Dataset reference used in this plugin is located in the ManiVault util namespace */
 using namespace mv::util;
 
+class MetadataSortFilterProxyModel;
 class QLabel;
 
 class MetadataView : public ViewPlugin
@@ -52,14 +54,19 @@ public:
      */
     void onDataEvent(mv::DatasetEvent* dataEvent);
 
+    void onFilterRangeChanged(float minVal, float maxVal);
+
 protected:
     DropWidget*             _dropWidget;                /** Widget for drag and drop behavior */
 
-    mv::Dataset<Text>       _currentDataset;
-    OptionAction*           _optionAction;
-    QLineEdit*              _searchInput;
-    QTableView*             _tableView;
-    TableModel*             _tableModel;
+    mv::Dataset<Text>               _currentDataset;
+    OptionAction*                   _optionAction;
+    QLineEdit*                      _searchInput;
+    QTableView*                     _tableView;
+    TableModel*                     _tableModel;
+    QComboBox*                      _filterOptions;
+    FilterView*                     _filterView;
+    MetadataSortFilterProxyModel*   _proxyModel;
 
     // Search GUI
     ToggleAction*           _selectionModeButton;

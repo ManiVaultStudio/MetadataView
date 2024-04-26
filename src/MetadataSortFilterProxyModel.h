@@ -49,6 +49,9 @@ class MetadataSortFilterProxyModel : public QSortFilterProxyModel
 public:
     MetadataSortFilterProxyModel(QObject* parent = nullptr);
 
+    void refresh() { invalidateFilter(); }
+
+    std::unordered_map<QString, Filter*>& getFilters() { return _filters; }
     void addFilter(QString columnName, Filter* filter) { _filters[columnName] = filter; invalidateFilter(); }
 
 protected:

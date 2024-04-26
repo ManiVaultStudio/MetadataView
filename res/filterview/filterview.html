@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+    <title>Filter View</title>
+    <meta content="utf-8" http-equiv="encoding">
+
+    <!-- qt connection -->
+    <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script type="text/javascript" src="../js_libs/qwebchannel.tools.js"></script>
+
+    <!-- plot and communication functions // this has to be loaded after the other scripts -->
+    <script src="filterview.tools.js"></script>
+    
+    <!-- stylesheet for radar plot -->
+    <!--<link rel="stylesheet" type="text/css" href="../js_libs/radar-chart.min.css"> -->
+    <link rel="stylesheet" type="text/css" href="filterview.css">
+
+
+    <!-- auto-resizeable container for plot -->
+    <style>
+        .body {
+            overflow: hidden;
+        }
+        
+        #sagFilter {
+            display: inline-block;
+            width: 200px;
+            height: 120px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sagFilter">
+        <div id="filter_header">Sag</div>
+        <div class="range_container">
+            <div class="sliders_control">
+                <input id="fromSlider" type="range" value="10.0" min="0.0" max="100.0" step="0.01" onChange={handleChange}/>
+                <input id="toSlider" type="range" value="40.0" min="0.0" max="100.0" step="0.01"/>
+            </div>
+            <div class="form_control">
+                <div class="form_control_container">
+                    <div class="form_control_container__time">Min</div>
+                    <input class="form_control_container__time__input" type="number" id="fromInput" value="10" min="0" max="100" step="0.01"/>
+                </div>
+                <div class="form_control_container">
+                    <div class="form_control_container__time">Max</div>
+                    <input class="form_control_container__time__input" type="number" id="toInput" value="40" min="0" max="100" step="0.01"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="dualRangeSlider.js"></script>
+</body>
+</html>

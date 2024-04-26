@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="">
+        <file>filterview/filterview.html</file>
+        <file>filterview/filterview.css</file>
+        <file>filterview/filterview.tools.js</file>
+        <file>filterview/dualRangeSlider.js</file>
+    </qresource>
+    <qresource prefix="">
+        <file>js_libs/qwebchannel.tools.js</file>
+   </qresource>
+</RCC>

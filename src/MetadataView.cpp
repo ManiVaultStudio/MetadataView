@@ -47,9 +47,6 @@ void MetadataView::init()
     });
 
     _tableModel = new TableModel(&this->getWidget());
-    _tableModel->setHeaderData(0, Qt::Horizontal, QObject::tr("Beep"));
-    _tableModel->setHeaderData(1, Qt::Horizontal, QObject::tr("Boop"));
-    _tableModel->setHeaderData(2, Qt::Horizontal, QObject::tr("Bep"));
 
     QList<TableModel::Header> headers;
     headers.append(TableModel::Header{ "Cell ID", "cell_id" });
@@ -63,21 +60,10 @@ void MetadataView::init()
 
     _tableView = new QTableView(&this->getWidget());
     _tableView->setSortingEnabled(true);
-    //connect(_tableModel, &QAbstractItemModel::rowsInserted, _tableView, &QTableView::update);
 
-    _tableModel->insertColumns(0, 5);
-    _tableModel->insertRows(0, 3);
-
-    // TODO Fix memory leak
-    FloatFilter* sagFilter = new FloatFilter("Sag");
-    sagFilter->minValue = 0.2;
-    sagFilter->maxValue = 0.5;
-
-    MetadataSortFilterProxyModel* proxyModel = new MetadataSortFilterProxyModel(this);
-    proxyModel->addFilter("Sag", sagFilter);
-
-    proxyModel->setSourceModel(_tableModel);
-    _tableView->setModel(proxyModel);
+    _proxyModel = new MetadataSortFilterProxyModel(this);
+    _proxyModel->setSourceModel(_tableModel);
+    _tableView->setModel(_proxyModel);
     _tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     QItemSelectionModel* selectionModel = _tableView->selectionModel();
@@ -93,9 +79,32 @@ void MetadataView::init()
         events().notifyDatasetDataSelectionChanged(_currentDataset);
     });
 
+    // Filter options
+    QStandardItemModel* dimensionsModel = new QStandardItemModel(3, 1, this);
+    for (int i = 0; i < 3; i++)
+    {
+        QStandardItem* item = new QStandardItem(QString("Item %0").arg(i));
+
+        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->setData(Qt::Unchecked, Qt::CheckStateRole);
+
+        dimensionsModel->setItem(i, 0, item);
+    }
+    _filterOptions = new QComboBox();
+    _filterOptions->setModel(dimensionsModel);
+
+    // Filter view
+    _filterView = new FilterView(this);
+    _filterView->setPage(":filterview/filterview.html", "qrc:/filterview/");
+
+    // connect On Filter Range Changed
+    connect(&_filterView->getCommunicationObject(), &FilterCommunicationObject::onFilterRangeChanged, this, &MetadataView::onFilterRangeChanged);
+
     layout->addWidget(_optionAction->createWidget(&this->getWidget(), OptionAction::WidgetFlag::LineEdit));
     layout->addWidget(_tableView);
+    layout->addWidget(_filterView);
     layout->addWidget(_selectionModeButton->createWidget(&this->getWidget()));
+    layout->addWidget(_filterOptions);
 
     // Check if a text dataset already exist that contains "metadata" in the name
     for (mv::Dataset dataset : mv::data().getAllDatasets())
@@ -166,6 +175,28 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
             // Get the GUI name of the added points dataset and print to the console
             qDebug() << datasetGuiName << "was changed";
 
+            // Compute range of sag
+            std::vector<QString> sagColumn = _currentDataset->getColumn("sag");
+            float minValue = std::numeric_limits<float>::max();
+            float maxValue = -std::numeric_limits<float>::max();
+
+            for (int i = 0; i < sagColumn.size(); i++)
+            {
+                QString& s = sagColumn[i];
+                if (s.isEmpty())
+                    continue;
+
+                float value = sagColumn[i].toFloat();
+                if (value < minValue) minValue = value;
+                if (value > maxValue) maxValue = value;
+            }
+
+            QVariantList vals;
+            vals.append(minValue);
+            vals.append(maxValue);
+
+            emit _filterView->getCommunicationObject().qt_js_setDataAndPlotInJS(vals);
+
             break;
         }
 
@@ -185,6 +216,27 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
 
         default:
             break;
+    }
+}
+
+void MetadataView::onFilterRangeChanged(float minVal, float maxVal)
+{
+    if (_proxyModel->getFilters().find("Sag") != _proxyModel->getFilters().end())
+    {
+        FloatFilter* filter = dynamic_cast<FloatFilter*>(_proxyModel->getFilters().at("Sag"));
+        filter->minValue = minVal;
+        filter->maxValue = maxVal;
+
+        _proxyModel->refresh();
+    }
+    else
+    {
+        // TODO Fix memory leak
+        FloatFilter* sagFilter = new FloatFilter("Sag");
+        sagFilter->minValue = 0.2;
+        sagFilter->maxValue = 0.5;
+
+        _proxyModel->addFilter("Sag", sagFilter);
     }
 }
 
