@@ -24,6 +24,11 @@ MetadataView::MetadataView(const PluginFactory* factory) :
     _dropWidget(nullptr),
     _tableModel(nullptr),
     _tableView(nullptr),
+    _optionAction(nullptr),
+    _searchInput(nullptr),
+    _filterOptions(nullptr),
+    _filterView(nullptr),
+    _proxyModel(nullptr),
     _selectionModeButton(nullptr)
 {
 
@@ -31,6 +36,10 @@ MetadataView::MetadataView(const PluginFactory* factory) :
 
 void MetadataView::init()
 {
+    // 
+    connect(&_currentDataset, &mv::Dataset<DatasetImpl>::changed, this, &MetadataView::onDataChanged);
+    connect(&_currentDataset, &mv::Dataset<DatasetImpl>::dataChanged, this, &MetadataView::onDataChanged);
+
     // Create layout
     auto layout = new QVBoxLayout();
 
@@ -80,7 +89,7 @@ void MetadataView::init()
     });
 
     // Filter options
-    QStandardItemModel* dimensionsModel = new QStandardItemModel(3, 1, this);
+    _dimensionsModel = new QStandardItemModel(3, 1, this);
     for (int i = 0; i < 3; i++)
     {
         QStandardItem* item = new QStandardItem(QString("Item %0").arg(i));
@@ -88,17 +97,14 @@ void MetadataView::init()
         item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         item->setData(Qt::Unchecked, Qt::CheckStateRole);
 
-        dimensionsModel->setItem(i, 0, item);
+        _dimensionsModel->setItem(i, 0, item);
     }
     _filterOptions = new QComboBox();
-    _filterOptions->setModel(dimensionsModel);
+    _filterOptions->setModel(_dimensionsModel);
 
     // Filter view
     _filterView = new FilterView(this);
-    _filterView->setPage(":filterview/filterview.html", "qrc:/filterview/");
-
-    // connect On Filter Range Changed
-    connect(&_filterView->getCommunicationObject(), &FilterCommunicationObject::onFilterRangeChanged, this, &MetadataView::onFilterRangeChanged);
+    _filterView->setPage(":metadata_view/filterview/filterview.html", "qrc:/metadata_view/filterview/");
 
     layout->addWidget(_optionAction->createWidget(&this->getWidget(), OptionAction::WidgetFlag::LineEdit));
     layout->addWidget(_tableView);
@@ -112,22 +118,13 @@ void MetadataView::init()
         if (dataset->getGuiName().contains("metadata"))
         {
             _currentDataset = dataset;
-            _tableModel->setData(dataset);
-            _optionAction->setCustomModel(_tableModel);
         }
     }
 
     // Apply the layout
     getWidget().setLayout(layout);
 
-    //// Respond when the name of the dataset in the dataset reference changes
-    //connect(&_points, &Dataset<Points>::guiNameChanged, this, [this]() {
-
-    //    auto newDatasetName = _points->getGuiName();
-
-    //    // Only show the drop indicator when nothing is loaded in the dataset reference
-    //    _dropWidget->setShowDropIndicator(newDatasetName.isEmpty());
-    //});
+    connect(&_filterView->getCommunicationObject(), &FilterCommunicationObject::onFilterRangeChanged, this, &MetadataView::onFilterRangeChanged);
 
     // Alternatively, classes which derive from hdsp::EventListener (all plugins do) can also respond to events
     _eventListener.addSupportedEventType(static_cast<std::uint32_t>(EventType::DatasetAdded));
@@ -156,8 +153,6 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
 
             _currentDataset = changedDataSet;
 
-            _tableModel->setData(changedDataSet);
-
             // Get the GUI name of the added points dataset and print to the console
             qDebug() << datasetGuiName << "was added";
 
@@ -169,33 +164,6 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
             const auto dataChangedEvent = static_cast<DatasetDataChangedEvent*>(dataEvent);
 
             _currentDataset = changedDataSet;
-
-            _tableModel->setData(changedDataSet);
-
-            // Get the GUI name of the added points dataset and print to the console
-            qDebug() << datasetGuiName << "was changed";
-
-            // Compute range of sag
-            std::vector<QString> sagColumn = _currentDataset->getColumn("sag");
-            float minValue = std::numeric_limits<float>::max();
-            float maxValue = -std::numeric_limits<float>::max();
-
-            for (int i = 0; i < sagColumn.size(); i++)
-            {
-                QString& s = sagColumn[i];
-                if (s.isEmpty())
-                    continue;
-
-                float value = sagColumn[i].toFloat();
-                if (value < minValue) minValue = value;
-                if (value > maxValue) maxValue = value;
-            }
-
-            QVariantList vals;
-            vals.append(minValue);
-            vals.append(maxValue);
-
-            emit _filterView->getCommunicationObject().qt_js_setDataAndPlotInJS(vals);
 
             break;
         }
@@ -216,6 +184,49 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
 
         default:
             break;
+    }
+}
+
+void MetadataView::onDataChanged()
+{
+    qDebug() << "onDataChanged";
+
+    _tableModel->setData(_currentDataset);
+
+    // Get the GUI name of the added points dataset and print to the console
+    qDebug() << _currentDataset->getGuiName() << "was changed";
+
+    // Compute range of sag
+    std::vector<QString> sagColumn = _currentDataset->getColumn("sag");
+    float minValue = std::numeric_limits<float>::max();
+    float maxValue = -std::numeric_limits<float>::max();
+
+    for (int i = 0; i < sagColumn.size(); i++)
+    {
+        QString& s = sagColumn[i];
+        if (s.isEmpty())
+            continue;
+
+        float value = sagColumn[i].toFloat();
+        if (value < minValue) minValue = value;
+        if (value > maxValue) maxValue = value;
+    }
+
+    QVariantList vals;
+    vals.append(minValue);
+    vals.append(maxValue);
+
+    emit _filterView->getCommunicationObject().setFilterInJS(vals);
+
+    std::vector<QString> columnNames = _currentDataset->getColumnNames();
+    for (int i = 0; i < columnNames.size(); i++)
+    {
+        QStandardItem* item = new QStandardItem(columnNames[i]);
+
+        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->setData(Qt::Unchecked, Qt::CheckStateRole);
+
+        _dimensionsModel->setItem(i, 0, item);
     }
 }
 

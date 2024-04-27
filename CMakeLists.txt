@@ -57,7 +57,7 @@ set(WEB
 )
 
 set(QRESOURCES
-    res/resources.qrc
+    res/metadata_resources.qrc
 )
 QT6_ADD_RESOURCES(RESOURCE_FILES ${QRESOURCES})
 

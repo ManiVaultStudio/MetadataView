@@ -15,5 +15,5 @@ function drawChart(d) {
 
 function handleChange(minVal, maxVal)
 {
-    passSelectionToQt([minVal, maxVal])
+    onJsFilterChanged([minVal, maxVal])
 }

@@ -54,6 +54,8 @@ public:
      */
     void onDataEvent(mv::DatasetEvent* dataEvent);
 
+    void onDataChanged();
+
     void onFilterRangeChanged(float minVal, float maxVal);
 
 protected:
@@ -64,7 +66,10 @@ protected:
     QLineEdit*                      _searchInput;
     QTableView*                     _tableView;
     TableModel*                     _tableModel;
+
+    QStandardItemModel*             _dimensionsModel;
     QComboBox*                      _filterOptions;
+
     FilterView*                     _filterView;
     MetadataSortFilterProxyModel*   _proxyModel;
 

@@ -2,6 +2,8 @@
 
 #include "widgets/WebWidget.h"
 
+#include <QVariantList>
+
 Q_DECLARE_METATYPE(QVariantList)
 
 class MetadataView;
@@ -14,13 +16,13 @@ public:
 
 signals:
     // Signals from Qt to JS side
-    void qt_js_setDataAndPlotInJS(const QVariantList& data);
+    void setFilterInJS(const QVariantList& data);
 
     void onFilterRangeChanged(float minVal, float maxVal);
 
 public slots:
     // Invoked from JS side 
-    void js_qt_passSelectionToQt(const QVariantList& data);
+    void onJsFilterChanged(const QVariantList& data);
 };
 
 class FilterView : public mv::gui::WebWidget

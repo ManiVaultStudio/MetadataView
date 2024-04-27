@@ -16,7 +16,7 @@ FilterCommunicationObject::FilterCommunicationObject()
 {
 }
 
-void FilterCommunicationObject::js_qt_passSelectionToQt(const QVariantList& data) {
+void FilterCommunicationObject::onJsFilterChanged(const QVariantList& data) {
     float minVal = data[0].toFloat();
     float maxVal = data[1].toFloat();
     
@@ -40,7 +40,7 @@ FilterView::FilterView(MetadataView* plugin) :
     setMinimumHeight(200);
 
     // Ensure linking to the resources defined in res/example_chart.qrc
-    Q_INIT_RESOURCE(resources);
+    Q_INIT_RESOURCE(metadata_resources);
 
     // ManiVault and Qt create a "QtBridge" object on the js side which represents _comObject
     // there, we can connect the signals qt_js_* and call the slots js_qt_* from our communication object

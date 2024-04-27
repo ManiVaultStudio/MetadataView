@@ -59,7 +59,5 @@ protected:
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
 
 private:
-    //std::vector<Filter*> _filters;
-
     std::unordered_map<QString, Filter*> _filters;
 };
