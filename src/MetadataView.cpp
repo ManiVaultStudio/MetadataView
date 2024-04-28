@@ -19,6 +19,14 @@ Q_PLUGIN_METADATA(IID "studio.manivault.MetadataView")
 
 using namespace mv;
 
+namespace
+{
+    bool isDatasetMetadata(mv::Dataset<DatasetImpl> dataset)
+    {
+        return dataset->hasProperty("PatchSeqType") && dataset->getProperty("PatchSeqType").toString() == "Metadata";
+    }
+}
+
 MetadataView::MetadataView(const PluginFactory* factory) :
     ViewPlugin(factory),
     _dropWidget(nullptr),
@@ -115,10 +123,8 @@ void MetadataView::init()
     // Check if a text dataset already exist that contains "metadata" in the name
     for (mv::Dataset dataset : mv::data().getAllDatasets())
     {
-        if (dataset->getGuiName().contains("metadata"))
-        {
+        if (isDatasetMetadata(dataset))
             _currentDataset = dataset;
-        }
     }
 
     // Apply the layout
@@ -151,7 +157,8 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
             // Cast the data event to a data added event
             const auto dataAddedEvent = static_cast<DatasetAddedEvent*>(dataEvent);
 
-            _currentDataset = changedDataSet;
+            if (isDatasetMetadata(changedDataSet))
+                _currentDataset = changedDataSet;
 
             // Get the GUI name of the added points dataset and print to the console
             qDebug() << datasetGuiName << "was added";
@@ -163,7 +170,8 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
             // Cast the data event to a data added event
             const auto dataChangedEvent = static_cast<DatasetDataChangedEvent*>(dataEvent);
 
-            _currentDataset = changedDataSet;
+            if (isDatasetMetadata(changedDataSet))
+                _currentDataset = changedDataSet;
 
             break;
         }
