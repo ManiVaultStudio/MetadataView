@@ -49,7 +49,7 @@ QVariant TableModel::data(const QModelIndex& index, int role) const
         int rowIndex = _mode == TableModel::Mode::SELECTION ? _viewIndices[index.row()] : index.row();
 
         // Get the column based on the header name of the colIndex, then access the row from that
-        return _metadata->getColumn(_headers[index.column()].columnName)[rowIndex];
+        return _metadata->getColumn(_headers[index.column()])[rowIndex];
     }
 
     return QVariant();
@@ -62,7 +62,7 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
         if (orientation == Qt::Horizontal)
         {
             if (section < _headers.size())
-                return _headers[section].headerName;
+                return _headers[section];
             else
                 qWarning() << "Tried to access a column index higher than the number of header columns";
         }

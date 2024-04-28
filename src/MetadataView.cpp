@@ -65,14 +65,14 @@ void MetadataView::init()
 
     _tableModel = new TableModel(&this->getWidget());
 
-    QList<TableModel::Header> headers;
-    headers.append(TableModel::Header{ "Cell ID", "cell_id" });
-    headers.append(TableModel::Header{ "Cell Name", "cell_name_label" });
-    headers.append(TableModel::Header{ "Subclass", "tree_subclass" });
-    headers.append(TableModel::Header{ "Cluster", "tree_cluster" });
-    headers.append(TableModel::Header{ "Paradigm", "paradigm" });
-    headers.append(TableModel::Header{ "Sag", "sag" });
-    headers.append(TableModel::Header{ "Basal Dendrite Num Branches", "basal_dendrite_num_branches" });
+    QList<QString> headers;
+    headers.append("Cell ID");
+    headers.append("Cell Name");
+    headers.append("Subclass");
+    headers.append("Cluster");
+    headers.append("Paradigm");
+    headers.append("Sag");
+    headers.append("Num Branches (BD)");
     _tableModel->setHeaders(headers);
 
     _tableView = new QTableView(&this->getWidget());
@@ -114,11 +114,12 @@ void MetadataView::init()
     _filterView = new FilterView(this);
     _filterView->setPage(":metadata_view/filterview/filterview.html", "qrc:/metadata_view/filterview/");
 
-    layout->addWidget(_optionAction->createWidget(&this->getWidget(), OptionAction::WidgetFlag::LineEdit));
+    //layout->addWidget(_optionAction->createWidget(&this->getWidget(), OptionAction::WidgetFlag::LineEdit));
+    layout->addWidget(_filterOptions);
     layout->addWidget(_tableView);
     layout->addWidget(_filterView);
     layout->addWidget(_selectionModeButton->createWidget(&this->getWidget()));
-    layout->addWidget(_filterOptions);
+
 
     // Check if a text dataset already exist that contains "metadata" in the name
     for (mv::Dataset dataset : mv::data().getAllDatasets())
@@ -205,7 +206,7 @@ void MetadataView::onDataChanged()
     qDebug() << _currentDataset->getGuiName() << "was changed";
 
     // Compute range of sag
-    std::vector<QString> sagColumn = _currentDataset->getColumn("sag");
+    std::vector<QString> sagColumn = _currentDataset->getColumn("Sag");
     float minValue = std::numeric_limits<float>::max();
     float maxValue = -std::numeric_limits<float>::max();
 

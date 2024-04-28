@@ -37,7 +37,9 @@ FilterView::FilterView(MetadataView* plugin) :
     setAcceptDrops(true);
 
     setMinimumWidth(400);
-    setMinimumHeight(200);
+    setMinimumHeight(240);
+
+    setMaximumHeight(240);
 
     // Ensure linking to the resources defined in res/example_chart.qrc
     Q_INIT_RESOURCE(metadata_resources);
