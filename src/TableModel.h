@@ -18,7 +18,7 @@ public:
     void setMode(TableModel::Mode mode) { _mode = mode; updateModel(); }
 
     // Headers
-    void setHeaders(QList<QString> headers) { _headers = headers; }
+    void setHeaders(QList<QString> headers) { _headers = headers; updateLayout(); }
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -31,6 +31,7 @@ public slots:
 
 private:
     void updateModel();
+    void updateLayout();
 
     // Already implemented by QAbstractTableModel
     //QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;

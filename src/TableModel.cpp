@@ -13,10 +13,7 @@ void TableModel::setData(mv::Dataset<Text> data)
 {
     _metadata = data;
 
-    emit dataChanged(index(0, 0), index(rowCount()-1, columnCount()-1));
-
-    emit layoutAboutToBeChanged();
-    emit layoutChanged();
+    updateModel();
 }
 
 // Abstract Table Model Overrides
@@ -85,6 +82,11 @@ void TableModel::updateModel()
 {
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
 
+    updateLayout();
+}
+
+void TableModel::updateLayout()
+{
     emit layoutAboutToBeChanged();
     emit layoutChanged();
 }
