@@ -13,6 +13,21 @@ function drawChart(d) {
     setRangeMax(rangeMax);
 }
 
+function setHeaderOptions(d)
+{
+    log("FilterViewJS: filterview.tools.js: setHeaderOptions")
+    
+    selectOptions = document.querySelector('#mySelectOptions');
+    while (selectOptions.firstChild) {
+        selectOptions.removeChild(selectOptions.lastChild);
+    }
+    
+    for (let i = 0; i < d.length; i++)
+    {
+        addMultiSelectOption(d[i]);
+    }
+}
+
 function handleChange(minVal, maxVal)
 {
     onJsFilterChanged([minVal, maxVal])

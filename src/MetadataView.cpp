@@ -34,7 +34,6 @@ MetadataView::MetadataView(const PluginFactory* factory) :
     _tableView(nullptr),
     _optionAction(nullptr),
     _searchInput(nullptr),
-    _filterOptions(nullptr),
     _filterView(nullptr),
     _proxyModel(nullptr),
     _selectionModeButton(nullptr)
@@ -96,26 +95,11 @@ void MetadataView::init()
         events().notifyDatasetDataSelectionChanged(_currentDataset);
     });
 
-    // Filter options
-    _dimensionsModel = new QStandardItemModel(3, 1, this);
-    for (int i = 0; i < 3; i++)
-    {
-        QStandardItem* item = new QStandardItem(QString("Item %0").arg(i));
-
-        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        item->setData(Qt::Unchecked, Qt::CheckStateRole);
-
-        _dimensionsModel->setItem(i, 0, item);
-    }
-    _filterOptions = new QComboBox();
-    _filterOptions->setModel(_dimensionsModel);
-
     // Filter view
     _filterView = new FilterView(this);
     _filterView->setPage(":metadata_view/filterview/filterview.html", "qrc:/metadata_view/filterview/");
 
     //layout->addWidget(_optionAction->createWidget(&this->getWidget(), OptionAction::WidgetFlag::LineEdit));
-    layout->addWidget(_filterOptions);
     layout->addWidget(_tableView);
     layout->addWidget(_filterView);
     layout->addWidget(_selectionModeButton->createWidget(&this->getWidget()));
@@ -132,6 +116,7 @@ void MetadataView::init()
     getWidget().setLayout(layout);
 
     connect(&_filterView->getCommunicationObject(), &FilterCommunicationObject::onFilterRangeChanged, this, &MetadataView::onFilterRangeChanged);
+    connect(&_filterView->getCommunicationObject(), &FilterCommunicationObject::onHeaderOptionsChecked, this, &MetadataView::onHeaderOptionsChecked);
 
     // Alternatively, classes which derive from hdsp::EventListener (all plugins do) can also respond to events
     _eventListener.addSupportedEventType(static_cast<std::uint32_t>(EventType::DatasetAdded));
@@ -228,15 +213,12 @@ void MetadataView::onDataChanged()
     emit _filterView->getCommunicationObject().setFilterInJS(vals);
 
     std::vector<QString> columnNames = _currentDataset->getColumnNames();
+    QVariantList headerOptions;
     for (int i = 0; i < columnNames.size(); i++)
     {
-        QStandardItem* item = new QStandardItem(columnNames[i]);
-
-        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        item->setData(Qt::Unchecked, Qt::CheckStateRole);
-
-        _dimensionsModel->setItem(i, 0, item);
+        headerOptions.append(columnNames[i]);
     }
+    _filterView->setHeaderOptions(headerOptions);
 }
 
 void MetadataView::onFilterRangeChanged(float minVal, float maxVal)
@@ -258,6 +240,11 @@ void MetadataView::onFilterRangeChanged(float minVal, float maxVal)
 
         _proxyModel->addFilter("Sag", sagFilter);
     }
+}
+
+void MetadataView::onHeaderOptionsChecked(QStringList headerOptionsChecked)
+{
+    _tableModel->setHeaders(headerOptionsChecked);
 }
 
 ViewPlugin* MetadataViewFactory::produce()

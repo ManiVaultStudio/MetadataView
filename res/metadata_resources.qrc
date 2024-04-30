@@ -4,6 +4,8 @@
         <file>filterview/filterview.css</file>
         <file>filterview/filterview.tools.js</file>
         <file>filterview/dualRangeSlider.js</file>
+        <file>filterview/checkBoxSelect.js</file>
+        <file>filterview/checkBoxSelect.css</file>
     </qresource>
     <qresource prefix="metadata_view">
         <file>js_libs/qwebchannel.tools.js</file>

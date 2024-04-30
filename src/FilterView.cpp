@@ -24,6 +24,17 @@ void FilterCommunicationObject::onJsFilterChanged(const QVariantList& data) {
     emit onFilterRangeChanged(minVal, maxVal);
 }
 
+void FilterCommunicationObject::onJsHeaderOptionsChecked(const QVariantList& data)
+{
+    qDebug() << "OnJSHeaderOptionChecked";
+    QStringList headerOptionsChecked;
+    for (QVariant var : data)
+    {
+        headerOptionsChecked.push_back(var.toString());
+    }
+    qDebug() << headerOptionsChecked;
+    emit onHeaderOptionsChecked(headerOptionsChecked);
+}
 
 // =============================================================================
 // FilterView
@@ -49,6 +60,11 @@ FilterView::FilterView(MetadataView* plugin) :
     init(&_commObject);
 
     layout()->setContentsMargins(0, 0, 0, 0);
+}
+
+void FilterView::setHeaderOptions(const QVariantList& data)
+{
+    emit _commObject.setHeaderOptions(data);
 }
 
 void FilterView::initWebPage()

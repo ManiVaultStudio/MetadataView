@@ -17,12 +17,16 @@ public:
 signals:
     // Signals from Qt to JS side
     void setFilterInJS(const QVariantList& data);
+    void setHeaderOptions(const QVariantList& data);
 
+    // Signals triggered from JS side
     void onFilterRangeChanged(float minVal, float maxVal);
+    void onHeaderOptionsChecked(QStringList checkedHeaders);
 
 public slots:
     // Invoked from JS side 
     void onJsFilterChanged(const QVariantList& data);
+    void onJsHeaderOptionsChecked(const QVariantList& data);
 };
 
 class FilterView : public mv::gui::WebWidget
@@ -30,6 +34,8 @@ class FilterView : public mv::gui::WebWidget
     Q_OBJECT
 public:
     FilterView(MetadataView* plugin);
+
+    void setHeaderOptions(const QVariantList& data);
 
     FilterCommunicationObject& getCommunicationObject() { return _commObject; };
 

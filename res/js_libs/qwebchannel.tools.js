@@ -10,6 +10,7 @@ try {
 
         // register signals
         QtBridge.setFilterInJS.connect(function () { drawChart(arguments[0]); });
+        QtBridge.setHeaderOptions.connect(function () { setHeaderOptions(arguments[0]); });
 
         // confirm successful connection
         isQtAvailable = true;
@@ -36,6 +37,12 @@ function onJsFilterChanged(data) {
     if (isQtAvailable) {
         QtBridge.onJsFilterChanged(data);
     }
+}
+
+function onHeaderOptionChecked(data)
+{
+    if (isQtAvailable)
+        QtBridge.onJsHeaderOptionsChecked(data);
 }
 
 // utility function: pipe errors to log

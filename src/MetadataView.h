@@ -56,7 +56,9 @@ public:
 
     void onDataChanged();
 
+public slots:
     void onFilterRangeChanged(float minVal, float maxVal);
+    void onHeaderOptionsChecked(QStringList headerOptionsChecked);
 
 protected:
     DropWidget*             _dropWidget;                /** Widget for drag and drop behavior */
@@ -66,9 +68,6 @@ protected:
     QLineEdit*                      _searchInput;
     QTableView*                     _tableView;
     TableModel*                     _tableModel;
-
-    QStandardItemModel*             _dimensionsModel;
-    QComboBox*                      _filterOptions;
 
     FilterView*                     _filterView;
     MetadataSortFilterProxyModel*   _proxyModel;
