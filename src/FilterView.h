@@ -35,7 +35,7 @@ class FilterView : public mv::gui::WebWidget
 public:
     FilterView(MetadataView* plugin);
 
-    void setHeaderOptions(const QVariantList& data);
+    void setHeaderOptions(const std::vector<QString>& headerOptions);
 
     FilterCommunicationObject& getCommunicationObject() { return _commObject; };
 

@@ -62,8 +62,19 @@ FilterView::FilterView(MetadataView* plugin) :
     layout()->setContentsMargins(0, 0, 0, 0);
 }
 
-void FilterView::setHeaderOptions(const QVariantList& data)
+void FilterView::setHeaderOptions(const std::vector<QString>& headerOptions)
 {
+    QVariantList data;
+    for (int i = 0; i < headerOptions.size(); i++)
+    {
+        data.append(headerOptions[i]);
+        // Enable the first 6 dimensions by default
+        if (i < 6)
+            data.append(QVariant(true));
+        else
+            data.append(QVariant(false));
+    }
+    
     emit _commObject.setHeaderOptions(data);
 }
 

@@ -24,8 +24,10 @@ function setHeaderOptions(d)
     
     for (let i = 0; i < d.length; i++)
     {
-        addMultiSelectOption(d[i]);
+        addMultiSelectOption(d[i*2+0], d[i*2+1]);
     }
+    
+    checkboxStatusChange();
 }
 
 function handleChange(minVal, maxVal)

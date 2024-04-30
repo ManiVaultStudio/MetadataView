@@ -54,6 +54,7 @@ public:
      */
     void onDataEvent(mv::DatasetEvent* dataEvent);
 
+    void onNewCurrentDataset();
     void onDataChanged();
 
 public slots:

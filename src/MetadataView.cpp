@@ -43,8 +43,8 @@ MetadataView::MetadataView(const PluginFactory* factory) :
 
 void MetadataView::init()
 {
-    // 
-    connect(&_currentDataset, &mv::Dataset<DatasetImpl>::changed, this, &MetadataView::onDataChanged);
+    // Connect to events from the current dataset
+    connect(&_currentDataset, &mv::Dataset<DatasetImpl>::changed, this, &MetadataView::onNewCurrentDataset);
     connect(&_currentDataset, &mv::Dataset<DatasetImpl>::dataChanged, this, &MetadataView::onDataChanged);
 
     // Create layout
@@ -63,16 +63,6 @@ void MetadataView::init()
     });
 
     _tableModel = new TableModel(&this->getWidget());
-
-    QList<QString> headers;
-    headers.append("Cell ID");
-    headers.append("Cell Name");
-    headers.append("Subclass");
-    headers.append("Cluster");
-    headers.append("Paradigm");
-    headers.append("Sag");
-    headers.append("Num Branches (BD)");
-    _tableModel->setHeaders(headers);
 
     _tableView = new QTableView(&this->getWidget());
     _tableView->setSortingEnabled(true);
@@ -156,8 +146,7 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
             // Cast the data event to a data added event
             const auto dataChangedEvent = static_cast<DatasetDataChangedEvent*>(dataEvent);
 
-            if (isDatasetMetadata(changedDataSet))
-                _currentDataset = changedDataSet;
+            // TODO Update the table model
 
             break;
         }
@@ -181,9 +170,21 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
     }
 }
 
+void MetadataView::onNewCurrentDataset()
+{
+    if (!_currentDataset.isValid())
+        return;
+
+    // Check if the loaded dataset already has data, if so call data changed
+    if (_currentDataset->getNumRows() != 0 || _currentDataset->getNumColumns() != 0)
+    {
+        onDataChanged();
+    }
+}
+
 void MetadataView::onDataChanged()
 {
-    qDebug() << "onDataChanged";
+    auto start = std::chrono::high_resolution_clock::now();
 
     _tableModel->setData(_currentDataset);
 
@@ -212,13 +213,12 @@ void MetadataView::onDataChanged()
 
     emit _filterView->getCommunicationObject().setFilterInJS(vals);
 
-    std::vector<QString> columnNames = _currentDataset->getColumnNames();
-    QVariantList headerOptions;
-    for (int i = 0; i < columnNames.size(); i++)
-    {
-        headerOptions.append(columnNames[i]);
-    }
-    _filterView->setHeaderOptions(headerOptions);
+    // Set table header options in web view
+    _filterView->setHeaderOptions(_currentDataset->getColumnNames());
+
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    qDebug() << "MetadataView::onDataChanged() Elapsed time: " << elapsed.count() << " s\n";
 }
 
 void MetadataView::onFilterRangeChanged(float minVal, float maxVal)
@@ -256,8 +256,8 @@ mv::DataTypes MetadataViewFactory::supportedDataTypes() const
 {
     DataTypes supportedTypes;
 
-    // This example analysis plugin is compatible with points datasets
-    supportedTypes.append(PointType);
+    // This metadata view plugin is compatible with text datasets
+    supportedTypes.append(TextType);
 
     return supportedTypes;
 }

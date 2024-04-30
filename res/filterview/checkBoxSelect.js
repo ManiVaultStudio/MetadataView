@@ -28,7 +28,7 @@ function initMultiselect() {
   addMultiSelectOption("Help");
 }
 
-function addMultiSelectOption(optionName)
+function addMultiSelectOption(optionName, checked)
 {
     selectOptions = document.querySelector('#mySelectOptions');
     // <label for="one"><input type="checkbox" id="one" onchange="checkboxStatusChange()" value="one" /> First checkbox</label>
@@ -39,6 +39,7 @@ function addMultiSelectOption(optionName)
     input.id = optionName;
     input.setAttribute("onchange", "checkboxStatusChange()");
     input.value = optionName;
+    input.checked = checked;
     
     t = document.createTextNode(" " + optionName)
     label.appendChild(input);
