@@ -58,6 +58,7 @@ public:
     void onDataChanged();
 
 public slots:
+    void onWebPageLoaded();
     void onFilterRangeChanged(float minVal, float maxVal);
     void onHeaderOptionsChecked(QStringList headerOptionsChecked);
 

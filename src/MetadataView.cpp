@@ -87,20 +87,13 @@ void MetadataView::init()
 
     // Filter view
     _filterView = new FilterView(this);
+    connect(_filterView, &FilterView::webPageLoaded, this, &MetadataView::onWebPageLoaded);
     _filterView->setPage(":metadata_view/filterview/filterview.html", "qrc:/metadata_view/filterview/");
 
     //layout->addWidget(_optionAction->createWidget(&this->getWidget(), OptionAction::WidgetFlag::LineEdit));
     layout->addWidget(_tableView);
     layout->addWidget(_filterView);
     layout->addWidget(_selectionModeButton->createWidget(&this->getWidget()));
-
-
-    // Check if a text dataset already exist that contains "metadata" in the name
-    for (mv::Dataset dataset : mv::data().getAllDatasets())
-    {
-        if (isDatasetMetadata(dataset))
-            _currentDataset = dataset;
-    }
 
     // Apply the layout
     getWidget().setLayout(layout);
@@ -219,6 +212,17 @@ void MetadataView::onDataChanged()
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
     qDebug() << "MetadataView::onDataChanged() Elapsed time: " << elapsed.count() << " s\n";
+}
+
+void MetadataView::onWebPageLoaded()
+{
+    qDebug() << "Changing dataset because webpage loaded";
+    // Check if a text dataset already exist that contains "metadata" in the name
+    for (mv::Dataset dataset : mv::data().getAllDatasets())
+    {
+        if (isDatasetMetadata(dataset))
+            _currentDataset = dataset;
+    }
 }
 
 void MetadataView::onFilterRangeChanged(float minVal, float maxVal)

@@ -82,3 +82,9 @@ void FilterView::initWebPage()
 {
     qDebug() << "FilterView::initWebPage: WebChannel bridge is available.";
 }
+
+void FilterView::onWebPageLoaded(bool ok)
+{
+    qDebug() << "FilterView::onWebPageLoaded: Web page completely loaded.";
+    emit webPageLoaded();
+}
