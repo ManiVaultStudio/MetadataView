@@ -44,6 +44,8 @@ FilterView::FilterView(MetadataView* plugin) :
     _plugin(plugin),
     _commObject()
 {
+    connect(this, &WebWidget::webPageFullyLoaded, this, &FilterView::onWebPageFullyLoaded);
+
     // For more info on drag&drop behavior, see the ExampleViewPlugin project
     setAcceptDrops(true);
 
@@ -78,13 +80,8 @@ void FilterView::setHeaderOptions(const std::vector<QString>& headerOptions)
     emit _commObject.setHeaderOptions(data);
 }
 
-void FilterView::initWebPage()
+void FilterView::onWebPageFullyLoaded()
 {
-    qDebug() << "FilterView::initWebPage: WebChannel bridge is available.";
-}
-
-void FilterView::onWebPageLoaded(bool ok)
-{
-    qDebug() << "FilterView::onWebPageLoaded: Web page completely loaded.";
+    qDebug() << "FilterView::onWebPageFullyLoaded: Web page completely loaded.";
     emit webPageLoaded();
 }

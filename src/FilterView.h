@@ -43,11 +43,7 @@ signals:
     void webPageLoaded();
 
 private slots:
-    /** Is invoked when the js side calls js_available of the mv::gui::WebCommunicationObject (ChartCommObject)
-        js_available emits notifyJsBridgeIsAvailable, which is conencted to this slot in WebWidget.cpp*/
-    void initWebPage() override;
-
-    void onWebPageLoaded(bool ok) override;
+    void onWebPageFullyLoaded();
 
 private:
     MetadataView*                       _plugin;            // Pointer to the main plugin class
