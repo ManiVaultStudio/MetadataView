@@ -5,6 +5,8 @@
 #include <QDate>
 #include <QString>
 
+#include <unordered_map>
+
 class Filter
 {
 public:
