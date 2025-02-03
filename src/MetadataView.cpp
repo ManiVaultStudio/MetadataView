@@ -130,7 +130,7 @@ void MetadataView::onDataEvent(mv::DatasetEvent* dataEvent)
                 _currentDataset = changedDataSet;
 
             // Get the GUI name of the added points dataset and print to the console
-            qDebug() << datasetGuiName << "was added";
+            qDebug() << "[MetadataView]" << datasetGuiName << "was added";
 
             break;
         }
@@ -182,7 +182,7 @@ void MetadataView::onDataChanged()
     _tableModel->setData(_currentDataset);
 
     // Get the GUI name of the added points dataset and print to the console
-    qDebug() << _currentDataset->getGuiName() << "was changed";
+    qDebug() << "[MetadataView]" << _currentDataset->getGuiName() << "was changed";
 
     // Compute range of sag
     std::vector<QString> sagColumn = _currentDataset->getColumn("Sag");
