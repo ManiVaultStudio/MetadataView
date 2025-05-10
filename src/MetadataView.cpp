@@ -61,7 +61,7 @@ void MetadataView::init()
     connect(_selectionModeButton, &ToggleAction::toggled, this, [this](bool enabled) {
         _tableModel->setMode(enabled ? TableModel::Mode::SELECTION : TableModel::Mode::FILTER);
     });
-
+    getLearningCenterAction().getToolbarVisibleAction().setChecked(false);
     _tableModel = new TableModel(&this->getWidget());
 
     _tableView = new QTableView(&this->getWidget());
